@@ -17,7 +17,8 @@ AuthWindow::AuthWindow(QWidget *parent) :
     manager(new QNetworkAccessManager(this)),
     api_key(""),
     proj_id(""),
-    logged_in(false)
+    logged_in(false),
+    ww(nullptr)
 {
 
     ui->setupUi(this);
@@ -58,12 +59,18 @@ void AuthWindow::DoGetRequest(QString uri)
 void AuthWindow::DoPostRequest(QString uri, QJsonArray* request)
 {
     QJsonDocument req_doc(*request);
+    qDebug(req_doc.toJson(QJsonDocument::Indented));
+    std::stringstream str;
+    str << req_doc.toBinaryData().size();
+    std::string num_str = str.str();
+    qDebug("Size:");
+    qDebug(num_str.c_str());
     QNetworkRequest req;
-    req.setHeader(QNetworkRequest::KnownHeaders::ContentLengthHeader, QVariant(req_doc.toBinaryData().size()));
-    req.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QVariant("application/json"));
+    req.setHeader(QNetworkRequest::KnownHeaders::ContentLengthHeader, QVariant(req_doc.toJson().size()));
+    req.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QVariant("application/json; charset=utf-8"));
     req.setRawHeader("Devprom-Auth-Key", api_key.toStdString().c_str());
     req.setUrl(QUrl("http://alm.mtuci.ru/pm/"+proj_id+"/api/v1/"+uri));
-    manager->post(req, req_doc.toBinaryData());
+    manager->post(req, req_doc.toJson());
     delete request;
 }
 
@@ -75,10 +82,12 @@ void AuthWindow::ReplyFinished(QNetworkReply* reply)
     str << data_size;
     std::string num;
     num = str.str();
+    //Read the reply
+    QString str_rep = reply->readAll();
     qDebug("Data size:");
     qDebug(num.c_str());
     if (!logged_in)
-    {
+    { //Check test request's result
         if (data_size == 0)
         {
             QMessageBox msg_box;
@@ -89,16 +98,15 @@ void AuthWindow::ReplyFinished(QNetworkReply* reply)
         }
         else
         {
+            if (ww) delete ww;
             ww = new WorkingWindow(this, this);
             ww->show();
             connect(ww, &WorkingWindow::Closed, this, &AuthWindow::HandleChild);
             logged_in = true;
         }
     }
-    else
+    else // Parse answer and emit the result
     {
-        // Parse answer and emit the result
-        QString str_rep = reply->readAll();
         QJsonParseError er;
         QJsonDocument json_resp = QJsonDocument::fromJson(str_rep.toUtf8(), &er);
         //Check for any parsing errors
@@ -120,16 +128,16 @@ void AuthWindow::ReplyFinished(QNetworkReply* reply)
     {
        qDebug(headers[i].first + " " + headers[i].second);
     }
-    qDebug(reply->readAll());
+    qDebug(str_rep.toLatin1());
 }
 
 void AuthWindow::HandleChild()
 {
+    qDebug("Child closed.");
     disconnect(ww, &WorkingWindow::Closed, this, &AuthWindow::HandleChild);
     logged_in = false;
     api_key = "";
     proj_id = "";
-    ww = nullptr;
 }
 
 AuthWindow::~AuthWindow()

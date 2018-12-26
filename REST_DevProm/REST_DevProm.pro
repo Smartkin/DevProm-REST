@@ -27,11 +27,13 @@ CONFIG += c++11
 SOURCES += \
         main.cpp \
         authwindow.cpp \
-    workingwindow.cpp
+    workingwindow.cpp \
+    issue.cpp
 
 HEADERS += \
         authwindow.h \
-    workingwindow.h
+    workingwindow.h \
+    issue.h
 
 FORMS += \
         authwindow.ui \

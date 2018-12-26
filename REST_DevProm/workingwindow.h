@@ -11,6 +11,7 @@ class AuthWindow;
 class QJsonObject;
 class QCloseEvent;
 class QJsonArray;
+class Issue;
 
 class WorkingWindow : public QDialog
 {
@@ -29,6 +30,7 @@ private slots:
     void SetTasks();
     void HandleResponse(QJsonObject *resp);
     void AppendChange(int row, int col);
+    void SetChange(int row, int col);
 
 signals:
     void Closed();
@@ -37,6 +39,8 @@ private:
     Ui::WorkingWindow *ui;
     AuthWindow* api_holder;
     QJsonArray* req;
+    QList<Issue*> issue_list;
+    bool change;
 };
 
 #endif // WORKINGWINDOW_H
