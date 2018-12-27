@@ -24,10 +24,14 @@ public:
 protected:
     void closeEvent(QCloseEvent *event);
 
+private:
+    void AddToTable(QString id, QString caption, QString description);
 
 private slots:
     void GetTasks();
     void SetTasks();
+    void AddTask();
+    void DeleteTask();
     void HandleResponse(QJsonObject *resp);
     void AppendChange(int row, int col);
     void SetChange(int row, int col);
@@ -40,6 +44,7 @@ private:
     AuthWindow* api_holder;
     QJsonArray* req;
     QList<Issue*> issue_list;
+    QList<int> changed_rows;
     bool change;
 };
 

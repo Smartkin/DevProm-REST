@@ -74,6 +74,16 @@ void AuthWindow::DoPostRequest(QString uri, QJsonDocument* request)
     delete request;
 }
 
+void AuthWindow::DoDeleteRequest(QString uri, QString id)
+{
+    QNetworkRequest req;
+    req.setHeader(QNetworkRequest::KnownHeaders::ContentLengthHeader, QVariant(0));
+    req.setHeader(QNetworkRequest::KnownHeaders::ContentTypeHeader, QVariant("application/json; charset=utf-8"));
+    req.setRawHeader("Devprom-Auth-Key", api_key.toStdString().c_str());
+    req.setUrl(QUrl("http://alm.mtuci.ru/pm/"+proj_id+"/api/v1/"+uri+"/"+id));
+    manager->deleteResource(req);
+}
+
 void AuthWindow::ReplyFinished(QNetworkReply* reply)
 {
     qDebug("Got data");
@@ -114,11 +124,19 @@ void AuthWindow::ReplyFinished(QNetworkReply* reply)
         {
             qDebug(er.errorString().toLatin1());
         }
-        QJsonArray resp_ar = json_resp.array();
-        //Emit response for every entry
-        for (auto o : resp_ar)
+        if (json_resp.isArray())
         {
-            QJsonObject* resp_obj = new QJsonObject(o.toObject());
+            QJsonArray resp_ar = json_resp.array();
+            //Emit response for every entry
+            for (auto o : resp_ar)
+            {
+                QJsonObject* resp_obj = new QJsonObject(o.toObject());
+                emit ReceivedResponse(resp_obj);
+            }
+        }
+        else
+        {
+            QJsonObject* resp_obj = new QJsonObject(json_resp.object());
             emit ReceivedResponse(resp_obj);
         }
     }

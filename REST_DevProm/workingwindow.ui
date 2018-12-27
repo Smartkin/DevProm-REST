@@ -68,6 +68,20 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnAddTask">
+        <property name="text">
+         <string>Add Task</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnDelete">
+        <property name="text">
+         <string>Delete Task</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnLogout">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">

@@ -23,6 +23,7 @@ public:
 
     void DoGetRequest(QString uri);
     void DoPostRequest(QString uri, QJsonDocument* request);
+    void DoDeleteRequest(QString uri, QString id);
 
 private slots:
     void Auth();
