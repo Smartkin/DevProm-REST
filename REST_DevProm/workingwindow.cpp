@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QCloseEvent>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QList>
 
 WorkingWindow::WorkingWindow(QWidget *parent, AuthWindow* holder) :
@@ -36,7 +37,11 @@ void WorkingWindow::GetTasks()
 
 void WorkingWindow::SetTasks()
 {
-    api_holder->DoPostRequest("issues", req);
+    for(auto obj : *req)
+    {
+        QJsonDocument* doc_req = new QJsonDocument(obj.toObject());
+        api_holder->DoPostRequest("issues", doc_req);
+    }
     //Create new request because api_holder will delete it after sending
     req = new QJsonArray();
 }
@@ -87,10 +92,10 @@ void WorkingWindow::AppendChange(int row, int col)
         is.description = ui->tableTasks->item(row, 2)->text();
 
         req->append(QJsonObject({
-                                    //{"Id", is.id},
+                                    {"Id", is.id},
                                     {"Caption", is.caption},
                                     {"Description", is.description},
-                                    /*{"Type", is.type},
+                                    {"Type", is.type},
                                     {"Priority", is.priority},
                                     {"Estimation", is.estimation},
                                     {"Function", is.function},
@@ -104,7 +109,7 @@ void WorkingWindow::AppendChange(int row, int col)
                                     {"OrderNum", is.order_num},
                                     {"RecordCreated", is.record_created},
                                     {"RecordModified", is.record_modified},
-                                    {"State", is.state}*/
+                                    {"State", is.state}
                                 }));
         change = false;
     }

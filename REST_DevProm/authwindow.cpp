@@ -56,7 +56,7 @@ void AuthWindow::DoGetRequest(QString uri)
     manager->get(req);
 }
 
-void AuthWindow::DoPostRequest(QString uri, QJsonArray* request)
+void AuthWindow::DoPostRequest(QString uri, QJsonDocument* request)
 {
     QJsonDocument req_doc(*request);
     qDebug(req_doc.toJson(QJsonDocument::Indented));

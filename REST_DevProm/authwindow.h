@@ -11,7 +11,7 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class WorkingWindow;
 class QJsonObject;
-class QJsonArray;
+class QJsonDocument;
 
 class AuthWindow : public QMainWindow
 {
@@ -22,7 +22,7 @@ public:
     ~AuthWindow();
 
     void DoGetRequest(QString uri);
-    void DoPostRequest(QString uri, QJsonArray* request);
+    void DoPostRequest(QString uri, QJsonDocument* request);
 
 private slots:
     void Auth();
